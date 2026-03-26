@@ -77,5 +77,6 @@ def admin():
     else:
         return "Access denied", 403
     
+#  make sure the app binds to 0.0.0.0 so it's accessible outside the container
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)

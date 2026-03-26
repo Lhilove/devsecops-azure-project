@@ -19,6 +19,3 @@ EXPOSE 5000
 # Run the app
 CMD ["python", "app.py"]
 
-#  make sure the app binds to 0.0.0.0 so it's accessible outside the container
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
