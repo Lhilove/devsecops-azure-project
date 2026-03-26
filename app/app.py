@@ -67,5 +67,15 @@ def config():
         "debug": True
     })
 
+@app.route("/admin")
+def admin():
+    role = request.args.get("role")
+
+    # Weak auth logic
+    if role == "admin":
+        return "Welcome admin!"
+    else:
+        return "Access denied", 403
+    
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
