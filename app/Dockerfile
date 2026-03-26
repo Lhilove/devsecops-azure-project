@@ -6,6 +6,9 @@ WORKDIR /app
 
 # Copy files
 COPY . .
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app/ .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
