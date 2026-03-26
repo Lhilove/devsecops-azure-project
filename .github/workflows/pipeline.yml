@@ -49,7 +49,6 @@ jobs:
          only-severities: critical,high
          sarif-file: scout-report.sarif
 
-         
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         if: always()
