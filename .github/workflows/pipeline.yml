@@ -1,6 +1,8 @@
 name: DevSecOps CI security test
 
 on: [push]
+permissions:
+  contents: read
 
 jobs:
   sast_scan:
