@@ -69,18 +69,24 @@ def get_user(user_id):
 def ping():
     ip = request.args.get("ip")
 
+    if not ip:
+        return jsonify({"error": "IP parameter required"}), 400
+
     # Strict input validation (only allow digits + dots)
-    if not re.match(r"^[0-9.]+$", ip):
+    if not re.match(r"^(\d{1,3}\.){3}\d{1,3}$", ip):
         return jsonify({"error": "Invalid IP"}), 400
 
     # Safe subprocess execution (no shell)
     result = subprocess.run(
-        ["ping", "-c", "1", ip],
+        ["/bin/ping", "-c", "1", "-W", "2", ip],
         capture_output=True,
         text=True
     )
 
-    return jsonify({"result": result.stdout})
+    return jsonify({
+        "result": result.stdout if result.stdout else "No response",
+        "status": "success" if result.returncode == 0 else "unreachable"
+    })
 
 
 # SECURE CONFIG (Remove secrets exposure)
