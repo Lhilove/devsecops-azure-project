@@ -73,3 +73,10 @@ resource "azurerm_role_assignment" "aks_acr" {
   role_definition_name = "AcrPull"
   scope                = azurerm_container_registry.acr.id
 }
+resource "azurerm_log_analytics_workspace" "logs" {
+  name                = "devsecops-logs"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
