@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 .env
 *.db
-k8s/
 infra/.terraform/
 infra/terraform.tfstate
 infra/terraform.tfstate.backup

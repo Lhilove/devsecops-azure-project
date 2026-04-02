@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devsecops-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devsecops-app
+  template:
+    metadata:
+      labels:
+        app: devsecops-app
+    spec:
+      containers:
+      - name: devsecops-app
+        image: devsecopsakr123.azurecr.io/devsecops-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: ADMIN_TOKEN
+        - name: USER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: USER_TOKEN
