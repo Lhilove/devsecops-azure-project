@@ -1,6 +1,6 @@
 # 🔐 DevSecOps CI/CD Pipeline on Azure
 
-A production-style DevSecOps project that demonstrates how to embed security into every stage of a software delivery pipeline — from code to cloud. Built with a deliberately vulnerable Flask app, secured through automated CI/CD gates, containerized with Docker, deployed to Azure Kubernetes Service (AKS), and provisioned with Terraform.
+A production-style DevSecOps project that demonstrates how to embed security into every stage of a software delivery pipeline — from code to cloud. Built with a deliberately vulnerable Flask app, secured through automated CI/CD gates, containerized with Docker, deployed to Azure Kubernetes Service (AKS), provisioned with Terraform, and monitored with Microsoft Sentinel.
 
 ---
 
@@ -34,6 +34,13 @@ GitHub Actions CI/CD Pipeline
                 ▼
         Live Flask Application
         http://102.37.236.148
+                │
+                ▼
+     Azure Log Analytics Workspace
+                │
+                ▼
+        Microsoft Sentinel
+        (Security monitoring & threat detection)
 ```
 
 ---
@@ -53,6 +60,8 @@ GitHub Actions CI/CD Pipeline
 | Container Registry | Azure Container Registry (ACR) |
 | Kubernetes | Azure Kubernetes Service (AKS) |
 | Infrastructure as Code | Terraform |
+| Secrets Management | Kubernetes Secrets |
+| Monitoring & SIEM | Microsoft Sentinel + Log Analytics |
 
 ---
 
@@ -62,7 +71,7 @@ GitHub Actions CI/CD Pipeline
 devsecops-azure-project/
 │
 ├── app/
-│   ├── app.py              # Flask application (secure version)
+│   ├── app.py              # Flask application (secure version with structured logging)
 │   ├── init_db.py          # Database initialization
 │   └── requirements.txt    # Python dependencies
 │
@@ -201,7 +210,7 @@ def set_headers(response):
 The secure image was deployed to Azure Kubernetes Service with secrets managed via Kubernetes Secrets — not hardcoded in manifests.
 
 ```bash
-# Create Kubernetes secret
+# Create Kubernetes secret (never stored in repo)
 kubectl create secret generic app-secrets \
   --from-literal=ADMIN_TOKEN=<token> \
   --from-literal=USER_TOKEN=<token>
@@ -210,6 +219,8 @@ kubectl create secret generic app-secrets \
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 ```
+
+Secrets are referenced in `deployment.yaml` via `secretKeyRef` — no credentials are stored in the manifest or repository.
 
 ### Live Endpoints
 | Endpoint | Expected Result |
@@ -229,10 +240,11 @@ All Azure infrastructure is defined and managed as code.
 
 ```hcl
 # Resources provisioned
-azurerm_resource_group        → devsecops-rg
-azurerm_container_registry    → devsecopsakr123
-azurerm_kubernetes_cluster    → devsecops-aks
-azurerm_role_assignment       → AcrPull (AKS → ACR)
+azurerm_resource_group          → devsecops-rg
+azurerm_container_registry      → devsecopsakr123
+azurerm_kubernetes_cluster      → devsecops-aks
+azurerm_role_assignment         → AcrPull (AKS → ACR)
+azurerm_log_analytics_workspace → devsecops-logs
 ```
 
 ```bash
@@ -244,14 +256,90 @@ terraform apply
 
 ---
 
+## 📡 Phase 7: Security Monitoring (Microsoft Sentinel)
+
+Application logs are shipped from AKS to a Log Analytics Workspace and ingested by Microsoft Sentinel for real-time security monitoring and threat detection.
+
+### Setup
+```bash
+# Create Log Analytics Workspace
+az monitor log-analytics workspace create \
+  --resource-group devsecops-rg \
+  --workspace-name devsecops-logs \
+  --location southafricanorth
+
+# Enable Microsoft Sentinel on the workspace
+# (done via Azure Portal → Microsoft Sentinel → Add)
+
+# Connect AKS monitoring
+az aks enable-addons \
+  --resource-group devsecops-rg \
+  --name devsecops-aks \
+  --addons monitoring \
+  --workspace-resource-id <workspace-resource-id>
+```
+
+### Structured Security Logging
+
+Every security-relevant event is logged in structured JSON format:
+
+```python
+# Unauthorized access attempt
+logger.warning(json.dumps({
+    "event": "admin_access",
+    "status": "unauthorized",
+    "ip": request.remote_addr,
+    "token_provided": token is not None
+}))
+
+# Failed login attempt
+logger.warning(json.dumps({
+    "event": "login",
+    "status": "failed",
+    "username": username,
+    "ip": request.remote_addr
+}))
+
+# Blocked injection attempt
+logger.warning(json.dumps({
+    "event": "ping",
+    "status": "blocked_invalid_input",
+    "input": ip,
+    "ip": request.remote_addr
+}))
+```
+
+### Sentinel KQL Queries
+
+**Detect unauthorized access attempts:**
+```kusto
+ContainerLog
+| where LogEntry contains "unauthorized" or LogEntry contains "failed" or LogEntry contains "blocked"
+| project TimeGenerated, LogEntry
+| order by TimeGenerated desc
+```
+
+**All security events in last 30 minutes:**
+```kusto
+ContainerLog
+| where TimeGenerated > ago(30m)
+| project TimeGenerated, LogEntry, ContainerName
+| order by TimeGenerated desc
+| limit 50
+```
+
+---
+
 ## 🔑 Key Security Principles Demonstrated
 
 - **Shift-Left Security** — vulnerabilities caught in CI before they reach production
 - **Security as Code** — pipeline enforces policy automatically on every commit
 - **Least Privilege** — AKS only has AcrPull permission, not full ACR access
-- **Secrets Management** — no credentials in code or manifests; environment variables and Kubernetes Secrets used
+- **Secrets Management** — no credentials in code or manifests; Kubernetes Secrets used
 - **Defense in Depth** — multiple scanning layers (SAST + SCA + container + secrets)
 - **Before vs After** — vulnerable baseline documented and compared against remediated version
+- **Security Monitoring** — structured logging + Sentinel provides real-time threat visibility
+- **Audit Trail** — every security event (login, admin access, injection attempt) is logged with IP and timestamp
 
 ---
 
@@ -285,6 +373,8 @@ curl http://localhost:5000
 - ✅ Deployed a containerized workload to Azure Kubernetes Service
 - ✅ Provisioned cloud infrastructure reproducibly with Terraform
 - ✅ Managed secrets properly across code, pipeline, and Kubernetes
+- ✅ Integrated Microsoft Sentinel for real-time security monitoring
+- ✅ Implemented structured logging for audit trail and threat detection
 
 ---
 
