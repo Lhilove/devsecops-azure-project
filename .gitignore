@@ -4,3 +4,7 @@ __pycache__/
 .env
 *.db
 k8s/
+infra/.terraform/
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.terraform.lock.hcl
