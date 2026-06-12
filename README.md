@@ -1,10 +1,10 @@
-# 🔐 DevSecOps CI/CD Pipeline on Azure
+# DevSecOps CI/CD Pipeline on Azure
 
 A production-style DevSecOps project that demonstrates how to embed security into every stage of a software delivery pipeline — from code to cloud. Built with a deliberately vulnerable Flask app, secured through automated CI/CD gates, containerized with Docker, deployed to Azure Kubernetes Service (AKS), provisioned with Terraform, and monitored with Microsoft Sentinel.
 
 ---
 
-## 📌 Project Summary
+## Project Summary
 
 This project follows the **shift-left security** approach — catching vulnerabilities early in the development lifecycle rather than after deployment. Security is not an afterthought; it is enforced as a hard gate at every stage of the pipeline.
 
@@ -12,7 +12,7 @@ This project follows the **shift-left security** approach — catching vulnerabi
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 Developer Push
@@ -45,7 +45,7 @@ GitHub Actions CI/CD Pipeline
 
 ---
 
-## 🧰 Tech Stack
+## Tech Stack
 
 | Category | Tool |
 |---|---|
@@ -65,7 +65,7 @@ GitHub Actions CI/CD Pipeline
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 devsecops-azure-project/
@@ -94,7 +94,7 @@ devsecops-azure-project/
 
 ---
 
-## 🐛 Phase 1: Intentionally Vulnerable Application
+## Phase 1: Intentionally Vulnerable Application
 
 A Flask application was built with deliberate OWASP Top 10 vulnerabilities to serve as a realistic attack surface for security tooling.
 
@@ -111,7 +111,7 @@ A Flask application was built with deliberate OWASP Top 10 vulnerabilities to se
 
 ---
 
-## 🐳 Phase 2: Containerization
+## Phase 2: Containerization
 
 The application was containerized using Docker and pushed to both Docker Hub and Azure Container Registry.
 
@@ -123,7 +123,7 @@ docker push devsecopsakr123.azurecr.io/devsecops-app:latest
 
 ---
 
-## 🔄 Phase 3: CI/CD Security Pipeline
+## Phase 3: CI/CD Security Pipeline
 
 GitHub Actions pipeline triggers on every push to `main`. Each job must pass before the next runs.
 
@@ -145,7 +145,7 @@ After remediation, the pipeline passed all stages with zero blocking findings.
 
 ---
 
-## 🔧 Phase 4: Vulnerability Remediation
+## Phase 4: Vulnerability Remediation
 
 All identified vulnerabilities were fixed before deployment was permitted.
 
@@ -205,7 +205,7 @@ def set_headers(response):
 
 ---
 
-## ☁️ Phase 5: Azure Deployment (AKS)
+## Phase 5: Azure Deployment (AKS)
 
 The secure image was deployed to Azure Kubernetes Service with secrets managed via Kubernetes Secrets — not hardcoded in manifests.
 
@@ -234,7 +234,7 @@ Secrets are referenced in `deployment.yaml` via `secretKeyRef` — no credential
 
 ---
 
-## 🏗️ Phase 6: Infrastructure as Code (Terraform)
+## Phase 6: Infrastructure as Code (Terraform)
 
 All Azure infrastructure is defined and managed as code.
 
@@ -256,7 +256,7 @@ terraform apply
 
 ---
 
-## 📡 Phase 7: Security Monitoring (Microsoft Sentinel)
+## Phase 7: Security Monitoring (Microsoft Sentinel)
 
 Application logs are shipped from AKS to a Log Analytics Workspace and ingested by Microsoft Sentinel for real-time security monitoring and threat detection.
 
@@ -330,7 +330,7 @@ ContainerLog
 
 ---
 
-## 🔑 Key Security Principles Demonstrated
+## Key Security Principles Demonstrated
 
 - **Shift-Left Security** — vulnerabilities caught in CI before they reach production
 - **Security as Code** — pipeline enforces policy automatically on every commit
@@ -343,7 +343,7 @@ ContainerLog
 
 ---
 
-## 🚀 Running Locally
+## Running Locally
 
 ```bash
 # Clone the repo
@@ -363,22 +363,15 @@ curl http://localhost:5000
 
 ---
 
-## 📋 What This Project Proves
+## What This Project Proves
 
 > "I built a system that **prevents** insecure code from reaching production — not one that finds problems after the fact."
 
-- ✅ Designed and built a vulnerable app to validate security controls
-- ✅ Implemented automated security gates in CI/CD that block deployments
-- ✅ Remediated OWASP Top 10 vulnerabilities with documented before/after
-- ✅ Deployed a containerized workload to Azure Kubernetes Service
-- ✅ Provisioned cloud infrastructure reproducibly with Terraform
-- ✅ Managed secrets properly across code, pipeline, and Kubernetes
-- ✅ Integrated Microsoft Sentinel for real-time security monitoring
-- ✅ Implemented structured logging for audit trail and threat detection
-
----
-
-## 👤 Author
-
-**Adepelumi** — Application Security | DevSecOps  
-GitHub: [@Lhilove](https://github.com/Lhilove)
+- Designed and built a vulnerable app to validate security controls
+- Implemented automated security gates in CI/CD that block deployments
+- Remediated OWASP Top 10 vulnerabilities with documented before/after
+- Deployed a containerized workload to Azure Kubernetes Service
+- Provisioned cloud infrastructure reproducibly with Terraform
+- Managed secrets properly across code, pipeline, and Kubernetes
+- Integrated Microsoft Sentinel for real-time security monitoring
+- Implemented structured logging for audit trail and threat detection.
